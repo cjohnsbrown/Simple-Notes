@@ -1,7 +1,7 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
-namespace SimpleNotess.Api.Migrations
+namespace SimpleNotes.Api.Migrations
 {
     public partial class CreateIdentitySchema : Migration
     {

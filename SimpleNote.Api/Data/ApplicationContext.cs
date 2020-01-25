@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 
-namespace SimpleNotess.Api.Data
+namespace SimpleNotes.Api.Data
 {
     public class ApplicationContext : IdentityDbContext<ApplicationUser>
     {

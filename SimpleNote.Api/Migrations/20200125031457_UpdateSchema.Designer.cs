@@ -9,8 +9,8 @@ using SimpleNotes.Api.Data;
 namespace SimpleNotes.Api.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
-    [Migration("20200125015223_CreateIdentitySchema")]
-    partial class CreateIdentitySchema
+    [Migration("20200125031457_UpdateSchema")]
+    partial class UpdateSchema
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -191,6 +191,9 @@ namespace SimpleNotes.Api.Migrations
 
                     b.Property<bool>("PhoneNumberConfirmed")
                         .HasColumnType("INTEGER");
+
+                    b.Property<string>("SecretKey")
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("TEXT");

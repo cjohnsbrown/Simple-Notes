@@ -3,9 +3,9 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using SimpleNotess.Api.Data;
+using SimpleNotes.Api.Data;
 
-namespace SimpleNotess.Api.Migrations
+namespace SimpleNotes.Api.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
     partial class ApplicationContextModelSnapshot : ModelSnapshot
@@ -148,7 +148,7 @@ namespace SimpleNotess.Api.Migrations
                     b.ToTable("AspNetUserTokens");
                 });
 
-            modelBuilder.Entity("SimpleNotess.Api.Data.ApplicationUser", b =>
+            modelBuilder.Entity("SimpleNotes.Api.Data.ApplicationUser", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("TEXT");
@@ -189,6 +189,9 @@ namespace SimpleNotess.Api.Migrations
 
                     b.Property<bool>("PhoneNumberConfirmed")
                         .HasColumnType("INTEGER");
+
+                    b.Property<string>("SecretKey")
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("TEXT");

@@ -17,7 +17,7 @@
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
     },
-    "SimpleNotess.Api": {
+    "SimpleNotes.Api": {
       "commandName": "Project",
       "launchBrowser": true,
       "launchUrl": "weatherforecast",

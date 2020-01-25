@@ -57,6 +57,7 @@ namespace SimpleNotes.Api {
 
             app.UseRouting();
 
+            app.UseSession();
             app.UseAuthentication();
             app.UseAuthorization();
 
@@ -64,7 +65,6 @@ namespace SimpleNotes.Api {
                 endpoints.MapControllers();
             });
 
-            app.UseSession();
 
             // Create database
             context.Database.Migrate();

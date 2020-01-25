@@ -26,12 +26,12 @@ namespace SimpleNotes.Api.Controllers {
         [HttpPost]
         [AllowAnonymous]
         [Route("Login")]
-        public async Task<ActionResult> Login(UserModel model) {
+        public async Task<ActionResult> Login(LoginModel model) {
             Microsoft.AspNetCore.Identity.SignInResult result =
-                await SignInManager.PasswordSignInAsync(model.Username, model.CurrentPassword, model.RememberMe, lockoutOnFailure: false);
+                await SignInManager.PasswordSignInAsync(model.Username, model.Password, model.RememberMe, lockoutOnFailure: false);
 
             if (result.Succeeded) {
-                string derivedKey = Crypto.DeriveKey(model.CurrentPassword);
+                string derivedKey = Crypto.DeriveKey(model.Password);
                 HttpContext.Session.SetString(Crypto.UserKey, derivedKey);
                 return Ok();
             }
@@ -49,8 +49,9 @@ namespace SimpleNotes.Api.Controllers {
         }
 
         [HttpPut]
+        [AllowAnonymous]
         [Route("Register")]
-        public async Task<IActionResult> Register(UserModel model) {
+        public async Task<IActionResult> Register(RegisterModel model) {
             if (!ModelState.IsValid) {
                 return BadRequest();
             }
@@ -81,12 +82,9 @@ namespace SimpleNotes.Api.Controllers {
 
         [HttpPost]
         [Route("ChangePassword")]
-        public async Task<IActionResult> ChangePassword(string[] passwords) {
-            string currentPassword = passwords[0];
-            string newPassword = passwords[1];
-
+        public async Task<IActionResult> ChangePassword(ChangePasswordModel model) {
             var applicationUser = await  UserManager.GetUserAsync(User);
-            var result = await UserManager.ChangePasswordAsync(applicationUser, currentPassword, newPassword);
+            var result = await UserManager.ChangePasswordAsync(applicationUser, model.CurrentPassword, model.NewPassword);
             if (!result.Succeeded) {
                 foreach (var error in result.Errors) {
                     ModelState.AddModelError(string.Empty, error.Description);
@@ -95,11 +93,11 @@ namespace SimpleNotes.Api.Controllers {
             }
 
             // Get current derived key and decrypt the secret key
-            string derivedKey = Crypto.DeriveKey(currentPassword);
+            string derivedKey = Crypto.DeriveKey(model.CurrentPassword);
             string secretKey = Crypto.Decrypt(derivedKey, applicationUser.SecretKey);
 
             // Create new derived key to encrypt the secret key with
-            derivedKey = Crypto.DeriveKey(newPassword);
+            derivedKey = Crypto.DeriveKey(model.NewPassword);
             applicationUser.SecretKey = Crypto.Encrypt(derivedKey, secretKey);
             HttpContext.Session.SetString(Crypto.UserKey, derivedKey);
 

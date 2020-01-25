@@ -21,7 +21,7 @@ namespace SimpleNotes.Api {
 
         public IConfiguration Configuration { get; }
 
-// This method gets called by the runtime. Use this method to add services to the container.
+        // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services) {
             services.AddDbContext<ApplicationContext>(options =>
                 options.UseSqlite(
@@ -38,7 +38,15 @@ namespace SimpleNotes.Api {
                 options.Password.RequireUppercase = false;
             });
 
+
+            services.AddSession(options => {
+                options.Cookie.HttpOnly = true;
+                // Make the session cookie essential
+                options.Cookie.IsEssential = true;
+            });
+
             services.AddControllers();
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -55,6 +63,8 @@ namespace SimpleNotes.Api {
             app.UseEndpoints(endpoints => {
                 endpoints.MapControllers();
             });
+
+            app.UseSession();
 
             // Create database
             context.Database.Migrate();

@@ -5,11 +5,11 @@ VisualStudioVersion = 16.0.29709.97
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleNotes.Api", "SimpleNote.Api\SimpleNotes.Api.csproj", "{5868BFAC-A42C-4FDC-A47A-724864326F3F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleNotes.Crypto", "SimpleNotes.Crypto\SimpleNotes.Crypto.csproj", "{A0B457F7-AADD-4424-B7AC-D62837E410C7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleNotes.Cryptography", "SimpleNotes.Crypto\SimpleNotes.Cryptography.csproj", "{A0B457F7-AADD-4424-B7AC-D62837E410C7}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{F2D2B8DA-C3C2-4C71-A8BB-8ACD41540577}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleNotes.Crypto.Tests", "SimpleNotes.Crypto.Tests\SimpleNotes.Crypto.Tests.csproj", "{AF817C30-45AD-4189-8BF7-8138BD8B490A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleNotes.Cryptography.Tests", "SimpleNotes.Crypto.Tests\SimpleNotes.Cryptography.Tests.csproj", "{AF817C30-45AD-4189-8BF7-8138BD8B490A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -4,14 +4,17 @@ using System.Text;
 using System.Security.Cryptography;
 using System.Linq;
 
-namespace SimpleNotes.Crypto {
+namespace SimpleNotes.Cryptography {
 
     /// <summary>
     /// Class used for encypting/decrpying data stored in the database
     /// </summary>
     public static class Crypto {
 
+        public const string UserKey = "UserKey";
+
         private const int IV_Length = 16;
+
 
 
         /// <summary>

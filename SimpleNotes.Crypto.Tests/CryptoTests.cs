@@ -1,8 +1,8 @@
 ﻿using System;
-using SimpleNotes.Crypto;
+using SimpleNotes.Cryptography;
 using Xunit;
 
-namespace SimpleNotes.Crypto.Tests {
+namespace SimpleNotes.Cryptography.Tests {
     public class CryptoTests {
 
         [Fact]

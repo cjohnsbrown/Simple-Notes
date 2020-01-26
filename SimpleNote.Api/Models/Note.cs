@@ -10,7 +10,7 @@ namespace SimpleNotes.Api.Models {
         public string Title { get; set; }
         public string Content { get; set; }
         public bool Pinned { get; set; }
-        public DateTime Modified { get; set; }
+        public string ModifiedDate { get; set; }
         public IEnumerable<string> LabelIds { get; set; }
 
     }

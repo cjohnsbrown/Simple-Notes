@@ -10,7 +10,7 @@ namespace SimpleNotes.Api.Data {
         public static void Init(ApplicationContext context) {
             context.Database.Migrate();
             string createTable = "CREATE TABLE IF NOT EXISTS ";
-            string table = "Notes (Id TEXT PRIMARY KEY, Title TEXT, Content TEXT, Pinned BOOLEAN, Modified DATETIME)";
+            string table = "Notes (Id TEXT PRIMARY KEY, Title TEXT, Content TEXT, Pinned BOOLEAN, ModifiedDate TEXT)";
             context.Database.ExecuteSqlRaw(createTable + table);
             table = "Labels (Id TEXT PRIMARY KEY, Name TEXT)";
             context.Database.ExecuteSqlRaw(createTable + table);

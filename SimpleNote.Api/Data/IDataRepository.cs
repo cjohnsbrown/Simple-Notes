@@ -9,5 +9,8 @@ namespace SimpleNotes.Api.Data {
 
         Task<IEnumerable<Label>> GetUserLabelsAsync(string userId);
         Task<IEnumerable<Note>> GetUserNotesAsync(string userId);
+        Task<string> CreateNoteAsync(string userId, Note note);
+        Task<string> CreateLabelAsync(string userId, Label label);
+        Task AddLabelToNoteAsync(string noteId, string labelId);
     }
 }

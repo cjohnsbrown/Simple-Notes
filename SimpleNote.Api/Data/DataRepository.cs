@@ -16,11 +16,11 @@ namespace SimpleNotes.Api.Data {
             ConnectionString = config.GetConnectionString("DefaultConnection");
         }
 
-        public IEnumerable<Label> GetUserLabels(string userId) {
+        public async Task<IEnumerable<Label>> GetUserLabelsAsync(string userId) {
             using (var connection = new SQLiteConnection(ConnectionString)) {
                 connection.Open();
                 var param = new { Id = userId };
-                return connection.Query<Label>(@"
+                return await connection.QueryAsync<Label>(@"
                         SELECT * FROM Labels WHERE Id IN
                         (SELECT labels.Id FROM UserLabels
                             JOIN AspNetUsers as users
@@ -33,11 +33,11 @@ namespace SimpleNotes.Api.Data {
             }
         }
 
-        public IEnumerable<Label> GetNoteLabels(string noteId) {
+        public async Task<IEnumerable<Label>> GetNoteLabelsAsync(string noteId) {
             using (var connection = new SQLiteConnection(ConnectionString)) {
                 connection.Open();
                 var param = new { Id = noteId };
-                return connection.Query<Label>(@"
+                return await connection.QueryAsync<Label>(@"
                         SELECT * FROM Labels WHERE Id IN
                         (SELECT labels.Id FROM NoteLabels
                             JOIN Notes
@@ -50,11 +50,11 @@ namespace SimpleNotes.Api.Data {
             }
         }
 
-        public IEnumerable<Note> GetUserNotes(string userId) {
+        public async Task<IEnumerable<Note>> GetUserNotesAsync(string userId) {
             using (var connection = new SQLiteConnection(ConnectionString)) {
                 connection.Open();
                 var param = new { Id = userId };
-                return connection.Query<Note>(@"
+                return await connection.QueryAsync<Note>(@"
                         SELECT * FROM Notes WHERE Id IN
                         (SELECT notes.Id FROM UserNotes
                             JOIN AspNetUsers as users
@@ -66,5 +66,6 @@ namespace SimpleNotes.Api.Data {
 
             }
         }
+
     }
 }

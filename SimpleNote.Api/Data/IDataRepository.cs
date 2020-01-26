@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 namespace SimpleNotes.Api.Data {
     public interface IDataRepository {
 
-        IEnumerable<Label> GetUserLabels(string userId);
-        IEnumerable<Label> GetNoteLabels(string noteId);
-        IEnumerable<Note> GetUserNotes(string userId);
+        Task<IEnumerable<Label>> GetUserLabelsAsync(string userId);
+        Task<IEnumerable<Label>> GetNoteLabelsAsync(string noteId);
+       Task<IEnumerable<Note>> GetUserNotesAsync(string userId);
     }
 }

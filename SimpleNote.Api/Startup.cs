@@ -47,6 +47,8 @@ namespace SimpleNotes.Api {
 
             services.AddControllers();
 
+            services.AddScoped<IDataRepository, DataRepository>();
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

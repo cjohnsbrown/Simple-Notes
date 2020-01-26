@@ -101,8 +101,10 @@ namespace SimpleNotes.Api.Controllers {
             // Create new derived key to encrypt the secret key with
             derivedKey = Crypto.DeriveKey(model.NewPassword);
             applicationUser.SecretKey = Crypto.Encrypt(derivedKey, secretKey);
-            HttpContext.Session.SetString(Crypto.UserKey, derivedKey);
 
+            // Update stored keys
+            await UserManager.UpdateAsync(applicationUser);
+            HttpContext.Session.SetString(Crypto.UserKey, derivedKey);
             return Ok();
         }
 

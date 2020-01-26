@@ -41,7 +41,7 @@ namespace SimpleNotes.Api.Controllers {
 
             
             ModelState.AddModelError(string.Empty, "Username or password is incorrect.");
-            return BadRequest();
+            return BadRequest(ModelState);
         }
 
         [HttpPost]
@@ -55,13 +55,9 @@ namespace SimpleNotes.Api.Controllers {
         [AllowAnonymous]
         [Route("Register")]
         public async Task<IActionResult> Register(RegisterModel model) {
-            if (!ModelState.IsValid) {
-                return BadRequest();
-            }
-
             if (await UserManager.FindByNameAsync(model.Username) != null) {
-                ModelState.AddModelError(model.Username, $"A user named '{model.Username}' already exists");
-                return BadRequest();
+                ModelState.AddModelError(nameof(model.Username), $"A user named '{model.Username}' already exists");
+                return BadRequest(ModelState);
             }
 
             ApplicationUser applicationUser = new ApplicationUser { UserName = model.Username };
@@ -70,7 +66,7 @@ namespace SimpleNotes.Api.Controllers {
                 foreach (var error in result.Errors) {
                     ModelState.AddModelError(string.Empty, error.Description);
                 }
-                return BadRequest();
+                return BadRequest(ModelState);
             }
             
             // Get user key from password hash
@@ -95,7 +91,7 @@ namespace SimpleNotes.Api.Controllers {
                 foreach (var error in result.Errors) {
                     ModelState.AddModelError(string.Empty, error.Description);
                 }
-                return BadRequest();
+                return BadRequest(ModelState);
             }
 
             // Get current derived key and decrypt the secret key

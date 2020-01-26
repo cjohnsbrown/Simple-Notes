@@ -31,11 +31,11 @@ namespace SimpleNotes.Cryptography {
         }
 
         /// <summary>
-        /// Generate a random string
+        /// Generate a random 256-bit string
         /// </summary>
         /// <returns></returns>
         public static string RandomString() {
-            byte[] bytes = new byte[8];
+            byte[] bytes = new byte[32];
             using (var rng = RandomNumberGenerator.Create()) {
                 rng.GetBytes(bytes);
             }

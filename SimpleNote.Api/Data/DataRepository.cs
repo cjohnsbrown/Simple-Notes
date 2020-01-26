@@ -33,28 +33,11 @@ namespace SimpleNotes.Api.Data {
             }
         }
 
-        public async Task<IEnumerable<Label>> GetNoteLabelsAsync(string noteId) {
-            using (var connection = new SQLiteConnection(ConnectionString)) {
-                connection.Open();
-                var param = new { Id = noteId };
-                return await connection.QueryAsync<Label>(@"
-                        SELECT * FROM Labels WHERE Id IN
-                        (SELECT labels.Id FROM NoteLabels
-                            JOIN Notes
-                            On NoteLabels.NoteId = Notes.Id
-                            JOIN Labels 
-                            ON NoteLabels.LabelId = Labels.Id
-                            WHERE Notes.Id = @Id)",
-                            param);
-
-            }
-        }
-
         public async Task<IEnumerable<Note>> GetUserNotesAsync(string userId) {
             using (var connection = new SQLiteConnection(ConnectionString)) {
                 connection.Open();
                 var param = new { Id = userId };
-                return await connection.QueryAsync<Note>(@"
+                var notes  = await connection.QueryAsync<Note>(@"
                         SELECT * FROM Notes WHERE Id IN
                         (SELECT notes.Id FROM UserNotes
                             JOIN AspNetUsers as users
@@ -64,6 +47,20 @@ namespace SimpleNotes.Api.Data {
                             WHERE users.Id = @Id)",
                             param);
 
+                // Get labels added to each note
+                foreach(Note note in notes) {
+                    param = new { Id = note.Id };
+                    note.LabelIds = await connection.QueryAsync<string>(@"
+                    SELECT labels.Id FROM NoteLabels
+                        JOIN Notes
+                        On NoteLabels.NoteId = Notes.Id
+                        JOIN Labels 
+                        ON NoteLabels.LabelId = Labels.Id
+                        WHERE Notes.Id = @Id",
+                        param);
+                }
+
+                return notes;
             }
         }
 

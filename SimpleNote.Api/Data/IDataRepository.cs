@@ -8,7 +8,6 @@ namespace SimpleNotes.Api.Data {
     public interface IDataRepository {
 
         Task<IEnumerable<Label>> GetUserLabelsAsync(string userId);
-        Task<IEnumerable<Label>> GetNoteLabelsAsync(string noteId);
-       Task<IEnumerable<Note>> GetUserNotesAsync(string userId);
+        Task<IEnumerable<Note>> GetUserNotesAsync(string userId);
     }
 }

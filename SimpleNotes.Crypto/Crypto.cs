@@ -22,11 +22,15 @@ namespace SimpleNotes.Cryptography {
         /// </summary>
         /// <param name="password">The password to derive the key from</param>
         /// <returns></returns>
-        public static string DeriveKey(string password) {
-            byte[] hash;
+        public static string DeriveKey(string passwordHash) {
+            byte[] hash = Encoding.UTF8.GetBytes(passwordHash);
+
             using (var hasher = SHA256.Create()) {
-                hash = hasher.ComputeHash(Encoding.UTF8.GetBytes(password));
+                for (int i = 0; i < 1000; i++) {
+                    hash = hasher.ComputeHash(hash);
+                }
             }
+
             return Convert.ToBase64String(hash);
         }
 

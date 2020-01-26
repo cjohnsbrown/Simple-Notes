@@ -33,7 +33,8 @@ namespace SimpleNotes.Api.Controllers {
                 await SignInManager.PasswordSignInAsync(model.Username, model.Password, model.RememberMe, lockoutOnFailure: false);
 
             if (result.Succeeded) {
-                string derivedKey = Crypto.DeriveKey(model.Password);
+                var applicationUser = await UserManager.FindByNameAsync(model.Username);
+                string derivedKey = Crypto.DeriveKey(applicationUser.PasswordHash);
                 HttpContext.Session.SetString(Crypto.UserKey, derivedKey);
                 return Ok();
             }
@@ -63,13 +64,7 @@ namespace SimpleNotes.Api.Controllers {
                 return BadRequest();
             }
 
-            string derivedKey = Crypto.DeriveKey(model.NewPassword);
-            string secretKey = Crypto.RandomString();
-            ApplicationUser applicationUser = new ApplicationUser {
-                UserName = model.Username,
-                SecretKey = Crypto.Encrypt(derivedKey, secretKey)
-            };
-
+            ApplicationUser applicationUser = new ApplicationUser { UserName = model.Username };
             var result = await UserManager.CreateAsync(applicationUser, model.NewPassword);
             if (!result.Succeeded) {
                 foreach (var error in result.Errors) {
@@ -77,6 +72,15 @@ namespace SimpleNotes.Api.Controllers {
                 }
                 return BadRequest();
             }
+            
+            // Get user key from password hash
+            applicationUser = await UserManager.FindByNameAsync(model.Username);
+            string derivedKey = Crypto.DeriveKey(applicationUser.PasswordHash);
+
+            // Create and encrypt secret key
+            string secretKey = Crypto.RandomString();
+            applicationUser.SecretKey = Crypto.Encrypt(derivedKey, secretKey);
+            await UserManager.UpdateAsync(applicationUser);
 
             HttpContext.Session.SetString(Crypto.UserKey, derivedKey);
             return Ok();
@@ -95,11 +99,12 @@ namespace SimpleNotes.Api.Controllers {
             }
 
             // Get current derived key and decrypt the secret key
-            string derivedKey = Crypto.DeriveKey(model.CurrentPassword);
+            string derivedKey = HttpContext.Session.GetString(Crypto.UserKey);
             string secretKey = Crypto.Decrypt(derivedKey, applicationUser.SecretKey);
 
             // Create new derived key to encrypt the secret key with
-            derivedKey = Crypto.DeriveKey(model.NewPassword);
+            applicationUser = await UserManager.GetUserAsync(User);
+            derivedKey = Crypto.DeriveKey(applicationUser.PasswordHash);
             applicationUser.SecretKey = Crypto.Encrypt(derivedKey, secretKey);
 
             // Update stored keys

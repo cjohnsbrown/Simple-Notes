@@ -66,21 +66,6 @@ namespace SimpleNotes.Api {
             app.UseEndpoints(endpoints => {
                 endpoints.MapControllers();
             });
-
-
-            // Create database
-            context.Database.Migrate();
-            string createTable = "CREATE TABLE IF NOT EXISTS ";
-            string table = "Notes (Id TEXT PRIMARY KEY, Title TEXT, Content TEXT, Pineed BOOLEAN, Modified DATETIME)";
-            context.Database.ExecuteSqlRaw(createTable + table);
-            table = "Labels (Id TEXT PRIMARY KEY, Name TEXT)";
-            context.Database.ExecuteSqlRaw(createTable + table);
-            table = "UserNotes (UserId TEXT, NoteId TEXT)";
-            context.Database.ExecuteSqlRaw(createTable + table);
-            table = "UserLabels (UserId TEXT, LabelId TEXT)";
-            context.Database.ExecuteSqlRaw(createTable + table);
-            table = "NoteLabels (NoteId TEXT, LabelId TEXT)";
-            context.Database.ExecuteSqlRaw(createTable + table);
         }
     }
 }

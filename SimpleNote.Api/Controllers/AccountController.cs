@@ -11,8 +11,10 @@ using SimpleNotes.Api.Models;
 using SimpleNotes.Cryptography;
 
 namespace SimpleNotes.Api.Controllers {
+
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class AccountController : ControllerBase {
 
         private SignInManager<ApplicationUser> SignInManager { get; }
@@ -102,6 +104,13 @@ namespace SimpleNotes.Api.Controllers {
             HttpContext.Session.SetString(Crypto.UserKey, derivedKey);
 
             return Ok();
+        }
+
+        [HttpGet]
+        [AllowAnonymous]
+        [Route("IsAuthenticated")]
+        public bool IsAuthenticated() {
+            return User.Identity.IsAuthenticated;
         }
     }
 }

@@ -89,12 +89,10 @@ namespace SimpleNotes.Api.Data {
                 await connection.OpenAsync();
 
                 // Verify note and label both exist
-                var parm = new { Id = noteId };
-                var note = await connection.QueryAsync("SELECT Id FROM Notes WHERE Id = @Id LIMIT 1", parm);
-                parm = new { Id = labelId };
-                var label = await connection.QueryAsync("SELECT Id FROM Labels WHERE Id = @Id LIMIT 1", parm);
+                bool noteExists = await NoteExistsAsync(noteId);
+                bool labelExists = await LabelExistsAsync(labelId);
 
-                if (note.Any() && label.Any()) {
+                if (noteExists && labelExists) {
                     var insertParm = new { NoteId = noteId, LabelId = labelId };
                     string sql = "INSERT INTO NoteLabels VALUES (@NoteId, @LabelId)";
                     await connection.ExecuteAsync(sql, insertParm);
@@ -102,20 +100,22 @@ namespace SimpleNotes.Api.Data {
             }
         }
 
-        public async Task<Note> GetNoteAsync(string id) {
+        public async Task<bool> NoteExistsAsync(string id) {
             using (var connection = new SQLiteConnection(ConnectionString)) {
                 await connection.OpenAsync();
                 var param = new { Id = id };
-                return await connection.QueryFirstAsync<Note>("SELECT * FROM Notes WHERE Id = @Id", param);
+                var note = await connection.QueryFirstAsync("SELECT Id FROM Notes WHERE Id = @Id", param);
+                return note != null;
             }
         }
 
 
-        public async Task<Label> GetLabelAsync(string id) {
+        public async Task<bool> LabelExistsAsync(string id) {
             using (var connection = new SQLiteConnection(ConnectionString)) {
                 await connection.OpenAsync();
                 var param = new { Id = id };
-                return await connection.QueryFirstAsync<Label>("SELECT * FROM Labels WHERE Id = @Id", param);
+                var label = await connection.QueryFirstAsync("SELECT Id FROM Labels WHERE Id = @Id", param);
+                return label != null;
             }
         }
 

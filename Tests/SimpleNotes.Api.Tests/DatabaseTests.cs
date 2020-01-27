@@ -30,8 +30,7 @@ namespace SimpleNotes.Api.Tests {
 
             DataRepository repo = new DataRepository(ConnectionString);
             string id = await repo.CreateNoteAsync(userId, note);
-            Note storedNote = await repo.GetNoteAsync(id);
-            Assert.NotNull(storedNote);
+            Assert.True(await repo.NoteExistsAsync(id));
         }
 
         [Fact]
@@ -41,8 +40,7 @@ namespace SimpleNotes.Api.Tests {
 
             DataRepository repo = new DataRepository(ConnectionString);
             string id = await repo.CreateLabelAsync(userId, label);
-            Label storedLabel = await repo.GetLabelAsync(id);
-            Assert.NotNull(storedLabel);
+            Assert.True(await repo.LabelExistsAsync(id));
         }
 
         [Fact]

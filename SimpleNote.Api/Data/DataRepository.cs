@@ -23,47 +23,28 @@ namespace SimpleNotes.Api.Data {
         public async Task<IEnumerable<Label>> GetUserLabelsAsync(string userId) {
             using (var connection = new SQLiteConnection(ConnectionString)) {
                 connection.Open();
+                string query = @"SELECT * FROM Labels WHERE Id IN
+                                    (SELECT LabelId FROM UserLabels WHERE UserId = @Id)";
                 var param = new { Id = userId };
-                return await connection.QueryAsync<Label>(@"
-                        SELECT * FROM Labels WHERE Id IN
-                        (SELECT labels.Id FROM UserLabels
-                            JOIN AspNetUsers as users
-                            ON UserLabels.UserId = users.Id
-                            JOIN Labels 
-                            ON UserLabels.LabelId = Labels.Id
-                            WHERE users.Id = @Id)",
-                            param);
-
+                return await connection.QueryAsync<Label>(query, param);
             }
         }
 
         public async Task<IEnumerable<Note>> GetUserNotesAsync(string userId) {
             using (var connection = new SQLiteConnection(ConnectionString)) {
                 connection.Open();
+                string query = @"SELECT * FROM Notes WHERE Id IN
+                                    (SELECT NoteId FROM UserNotes WHERE UserId = @Id)";
                 var param = new { Id = userId };
-                var notes = await connection.QueryAsync<Note>(@"
-                        SELECT * FROM Notes WHERE Id IN
-                        (SELECT notes.Id FROM UserNotes
-                            JOIN AspNetUsers as users
-                            ON UserNotes.UserId = users.Id
-                            JOIN Notes 
-                            ON UserNotes.NoteId = notes.Id
-                            WHERE users.Id = @Id)",
-                            param);
+                var notes = await connection.QueryAsync<Note>(query, param);
 
                 // Get labels added to each note
+                query = @"SELECT LabelId FROM NoteLabels
+                          WHERE NoteId = @Id";
                 foreach (Note note in notes) {
                     param = new { Id = note.Id };
-                    note.LabelIds = await connection.QueryAsync<string>(@"
-                    SELECT labels.Id FROM NoteLabels
-                        JOIN Notes
-                        On NoteLabels.NoteId = Notes.Id
-                        JOIN Labels 
-                        ON NoteLabels.LabelId = Labels.Id
-                        WHERE Notes.Id = @Id",
-                        param);
+                    note.LabelIds = await connection.QueryAsync<string>(query, param);
                 }
-
                 return notes;
             }
         }

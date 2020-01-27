@@ -1,11 +1,11 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Dapper;
+using Microsoft.Extensions.Configuration;
 using SimpleNotes.Api.Models;
 using System;
 using System.Collections.Generic;
+using System.Data.SQLite;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Data.SQLite;
-using Dapper;
 
 namespace SimpleNotes.Api.Data {
     public class DataRepository : IDataRepository {
@@ -14,6 +14,10 @@ namespace SimpleNotes.Api.Data {
 
         public DataRepository(IConfiguration config) {
             ConnectionString = config.GetConnectionString("DefaultConnection");
+        }
+
+        public DataRepository(string connectionString) {
+            ConnectionString = connectionString;
         }
 
         public async Task<IEnumerable<Label>> GetUserLabelsAsync(string userId) {
@@ -69,19 +73,12 @@ namespace SimpleNotes.Api.Data {
             using (var connection = new SQLiteConnection(ConnectionString)) {
                 connection.Open();
                 var transaction = await connection.BeginTransactionAsync();
+                string sql = @"INSERT INTO Notes VALUES (@Id, @Title, @Content, @Pinned, @ModifiedDate)";
+                await connection.ExecuteAsync(sql, note, transaction);
 
-                SQLiteCommand command = new SQLiteCommand("INSERT INTO Notes VALUES (?,?,?,?,?)", connection);
-                command.Parameters.Add(note.Id);
-                command.Parameters.Add(note.Title);
-                command.Parameters.Add(note.Content);
-                command.Parameters.Add(note.Pinned);
-                command.Parameters.Add(note.ModifiedDate);
-                await command.ExecuteNonQueryAsync();
-
-                command = new SQLiteCommand("INSERT INTO UserNotes VALUES (?,?)", connection);
-                command.Parameters.Add(userId);
-                command.Parameters.Add(note.Id);
-                await command.ExecuteNonQueryAsync();
+                sql = "INSERT INTO UserNotes VALUES (@UserId, @NoteId)";
+                var param = new { UserId = userId, NoteId = note.Id };
+                await connection.ExecuteAsync(sql, param, transaction);
 
                 await transaction.CommitAsync();
                 return note.Id;
@@ -94,16 +91,12 @@ namespace SimpleNotes.Api.Data {
             using (var connection = new SQLiteConnection(ConnectionString)) {
                 connection.Open();
                 var transaction = await connection.BeginTransactionAsync();
+                string sql = "INSERT INTO Labels VALUES (@Id, @Name)";
+                await connection.ExecuteAsync(sql, label, transaction);
 
-                SQLiteCommand command = new SQLiteCommand("INSERT INTO Labels VALUES (?,?)", connection);
-                command.Parameters.Add(label.Id);
-                command.Parameters.Add(label.Name);
-                await command.ExecuteNonQueryAsync();
-
-                command = new SQLiteCommand("INSERT INTO UserLabels VALUES (?,?)", connection);
-                command.Parameters.Add(userId);
-                command.Parameters.Add(label.Id);
-                await command.ExecuteNonQueryAsync();
+                sql = "INSERT INTO UserLabels VALUES (@UserId, @LabelId)";
+                var param = new { UserId = userId, LabelID = label.Id };
+                await connection.ExecuteAsync(sql, param, transaction);
 
                 await transaction.CommitAsync();
                 return label.Id;
@@ -121,10 +114,9 @@ namespace SimpleNotes.Api.Data {
                 var label = await connection.QueryAsync("SELECT Id FROM Label WHERE Id = @Id LIMIT 1", parm);
 
                 if (note.Any() && label.Any()) {
-                    SQLiteCommand command = new SQLiteCommand("INSERT INTO NoteLabels VALUES (?,?)", connection);
-                    command.Parameters.Add(noteId);
-                    command.Parameters.Add(labelId);
-                    await command.ExecuteNonQueryAsync();
+                    var insertParm = new { NoteId = noteId, LabelId = labelId };
+                    string sql = "INSERT INTO NoteLabels VALUES (@NoteId, @LabelId)";
+                    await connection.ExecuteAsync(sql, insertParm);
                 }
             }
         }
@@ -134,6 +126,15 @@ namespace SimpleNotes.Api.Data {
                 await connection.OpenAsync();
                 var param = new { Id = id };
                 return await connection.QueryFirstAsync<Note>("SELECT * FROM Notes WHERE Id = @Id", param);
+            }
+        }
+
+
+        public async Task<Label> GetLabel(string id) {
+            using (var connection = new SQLiteConnection(ConnectionString)) {
+                await connection.OpenAsync();
+                var param = new { Id = id };
+                return await connection.QueryFirstAsync<Label>("SELECT * FROM Label WHERE Id = @Id", param);
             }
         }
 

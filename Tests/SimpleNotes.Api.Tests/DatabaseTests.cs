@@ -13,9 +13,9 @@ namespace SimpleNotes.Api.Tests {
         public DatabaseTests(DatabaseFixture fixture) {
             Fixture = fixture;
         }
-        
+
         [Fact]
-        public async Task CreateNotes() {
+        public async Task CreateNote() {
             string userId = "1234";
             Note note = new Note {
                 Title = "Test Title",
@@ -28,6 +28,17 @@ namespace SimpleNotes.Api.Tests {
             string id = await repo.CreateNoteAsync(userId, note);
             Note storedNote = await repo.GetNoteAsync(id);
             Assert.NotNull(storedNote);
+        }
+
+        [Fact]
+        public async Task CreateLabel() {
+            string userId = "1234";
+            Label label = new Label { Name = "Test Label" };
+
+            DataRepository repo = new DataRepository(Fixture.ConnectionString);
+            string id = await repo.CreateLabelAsync(userId, label);
+            Label storedLabel = await repo.GetLabelAsync(id);
+            Assert.NotNull(storedLabel);
         }
     }
 
@@ -42,7 +53,6 @@ namespace SimpleNotes.Api.Tests {
             }
         }
 
-        public void Dispose() {
-        }
+        public void Dispose() { }
     }
 }

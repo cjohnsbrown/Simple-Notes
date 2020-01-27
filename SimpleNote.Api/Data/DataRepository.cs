@@ -130,11 +130,11 @@ namespace SimpleNotes.Api.Data {
         }
 
 
-        public async Task<Label> GetLabel(string id) {
+        public async Task<Label> GetLabelAsync(string id) {
             using (var connection = new SQLiteConnection(ConnectionString)) {
                 await connection.OpenAsync();
                 var param = new { Id = id };
-                return await connection.QueryFirstAsync<Label>("SELECT * FROM Label WHERE Id = @Id", param);
+                return await connection.QueryFirstAsync<Label>("SELECT * FROM Labels WHERE Id = @Id", param);
             }
         }
 

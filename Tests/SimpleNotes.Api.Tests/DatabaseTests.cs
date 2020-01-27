@@ -59,14 +59,61 @@ namespace SimpleNotes.Api.Tests {
 
             // Add a note to the database that does not belong 
             await repo.CreateNoteAsync("OtherUser", note);
-            
+
+            IEnumerable<Note> notes = await repo.GetUserNotesAsync(userId);
+            Assert.Empty(notes);
+
             // Add a note for the test user
             string id = await repo.CreateNoteAsync(userId, note);
-            IEnumerable<Note> notes = await repo.GetUserNotesAsync(userId);
+            notes = await repo.GetUserNotesAsync(userId);
 
             // There should only be one note for the test user
             Assert.Single(notes);
             Assert.Equal(id, notes.First().Id);
+        }
+
+
+        [Fact]
+        public async Task GetLabelsForUser() {
+            string userId = Guid.NewGuid().ToString();
+            Label label = new Label { Name = "Test Label" };
+            DataRepository repo = new DataRepository(ConnectionString);
+
+            await repo.CreateLabelAsync("OtherUser", label);
+
+            // No labels should exist for this user
+            IEnumerable<Label> labels = await repo.GetUserLabelsAsync(userId);
+            Assert.Empty(labels);
+
+            // Add a label for the test user
+            string id = await repo.CreateLabelAsync(userId, label);
+            labels = await repo.GetUserLabelsAsync(userId);
+
+            // There should only be one label for the test user
+            Assert.Single(labels);
+            Assert.Equal(id, labels.First().Id);
+        }
+
+        [Fact]
+        public async Task AddLabelToNote() {
+            string userId = Guid.NewGuid().ToString();
+            Label label = new Label { Name = "Test Label" };
+            Note note = new Note {
+                Title = "Test Title",
+                Content = "Test Note",
+                Pinned = true,
+                ModifiedDate = "1/1/2020"
+            };
+
+            DataRepository repo = new DataRepository(ConnectionString);
+            string noteId = await repo.CreateNoteAsync(userId, note);
+            string labelId = await repo.CreateLabelAsync(userId, label);
+
+            await repo.AddLabelToNoteAsync(noteId, labelId);
+            IEnumerable<Note> notes = await repo.GetUserNotesAsync(userId);
+            IEnumerable<string> labelIds = notes.First().LabelIds;
+            Assert.Single(labelIds);
+            Assert.Equal(labelId, labelIds.First());
         }
     }
 

@@ -129,5 +129,13 @@ namespace SimpleNotes.Api.Data {
             }
         }
 
+        public async Task<Note> GetNoteAsync(string id) {
+            using (var connection = new SQLiteConnection(ConnectionString)) {
+                await connection.OpenAsync();
+                var param = new { Id = id };
+                return await connection.QueryFirstAsync<Note>("SELECT * FROM Notes WHERE Id = @Id", param);
+            }
+        }
+
     }
 }

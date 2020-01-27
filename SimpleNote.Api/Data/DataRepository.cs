@@ -119,5 +119,22 @@ namespace SimpleNotes.Api.Data {
             }
         }
 
+        public async Task UpdateNoteAsync(Note note) {
+            if (!await NoteExistsAsync(note.Id)) {
+                return;
+            }
+
+            using (var connection = new SQLiteConnection(ConnectionString)) {
+                await connection.OpenAsync();
+                string sql = @"UPDATE Notes SET
+                               Title = @Title, Content = @Content, 
+                               Pinned = @Pinned, ModifiedDate = @ModifiedDate
+                               WHERE Id = @Id";
+
+                await connection.ExecuteAsync(sql, note);
+            }
+
+        }
+
     }
 }

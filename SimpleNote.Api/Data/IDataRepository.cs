@@ -14,5 +14,6 @@ namespace SimpleNotes.Api.Data {
         Task AddLabelToNoteAsync(string noteId, string labelId);
         Task<bool> NoteExistsAsync(string id);
         Task<bool> LabelExistsAsync(string id);
+        Task UpdateNoteAsync(Note note);
     }
 }

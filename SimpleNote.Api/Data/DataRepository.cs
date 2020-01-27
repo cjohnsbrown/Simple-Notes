@@ -92,7 +92,7 @@ namespace SimpleNotes.Api.Data {
                 var parm = new { Id = noteId };
                 var note = await connection.QueryAsync("SELECT Id FROM Notes WHERE Id = @Id LIMIT 1", parm);
                 parm = new { Id = labelId };
-                var label = await connection.QueryAsync("SELECT Id FROM Label WHERE Id = @Id LIMIT 1", parm);
+                var label = await connection.QueryAsync("SELECT Id FROM Labels WHERE Id = @Id LIMIT 1", parm);
 
                 if (note.Any() && label.Any()) {
                     var insertParm = new { NoteId = noteId, LabelId = labelId };

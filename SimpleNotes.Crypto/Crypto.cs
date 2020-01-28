@@ -16,7 +16,6 @@ namespace SimpleNotes.Cryptography {
         private const int IV_Length = 16;
 
 
-
         /// <summary>
         /// Generate the key for encrypting/decrpyting data
         /// </summary>

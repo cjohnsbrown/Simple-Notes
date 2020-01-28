@@ -34,7 +34,7 @@ namespace SimpleNotes.Api.Controllers {
 
             if (result.Succeeded) {
                 var applicationUser = await UserManager.FindByNameAsync(model.Username);
-                string derivedKey = Crypto.DeriveKey(applicationUser.PasswordHash);
+                string derivedKey = Crypto.DeriveKey(model.Password);
                 HttpContext.Session.SetString(Crypto.UserKey, derivedKey);
                 return Ok();
             }
@@ -69,9 +69,9 @@ namespace SimpleNotes.Api.Controllers {
                 return BadRequest(ModelState);
             }
             
-            // Get user key from password hash
+            // Get user key from password
             applicationUser = await UserManager.FindByNameAsync(model.Username);
-            string derivedKey = Crypto.DeriveKey(applicationUser.PasswordHash);
+            string derivedKey = Crypto.DeriveKey(model.NewPassword);
 
             // Create and encrypt secret key
             string secretKey = Crypto.RandomString();
@@ -100,7 +100,7 @@ namespace SimpleNotes.Api.Controllers {
 
             // Create new derived key to encrypt the secret key with
             applicationUser = await UserManager.GetUserAsync(User);
-            derivedKey = Crypto.DeriveKey(applicationUser.PasswordHash);
+            derivedKey = Crypto.DeriveKey(model.NewPassword);
             applicationUser.SecretKey = Crypto.Encrypt(derivedKey, secretKey);
 
             // Update stored keys

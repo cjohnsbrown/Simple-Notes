@@ -8,7 +8,7 @@ namespace SimpleNotes.Cryptography.Tests {
         [Fact]
         public void DeriveKeyForPassowrd() {
             string password = "Password_1";
-            string key = "aLYGMYOcgI5WK/X8PAp8L6K/xcH3tj5vbIYcvdhoOtw=";
+            string key = "/aExOhfLY8QV11tghX5NpRXydJUyIu6kPWwO+mwyMnU=";
             string output = Crypto.DeriveKey(password);
             Assert.Equal(output, key);
 

@@ -22,8 +22,8 @@ namespace SimpleNotes.Cryptography {
         /// </summary>
         /// <param name="password">The password to derive the key from</param>
         /// <returns></returns>
-        public static string DeriveKey(string passwordHash) {
-            byte[] hash = Encoding.UTF8.GetBytes(passwordHash);
+        public static string DeriveKey(string password) {
+            byte[] hash = Encoding.UTF8.GetBytes(password);
 
             using (var hasher = SHA256.Create()) {
                 for (int i = 0; i < 1000; i++) {

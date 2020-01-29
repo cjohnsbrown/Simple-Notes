@@ -104,8 +104,8 @@ namespace SimpleNotes.Api.Data {
             using (var connection = new SQLiteConnection(ConnectionString)) {
                 await connection.OpenAsync();
                 var param = new { Id = id };
-                var note = await connection.QueryFirstAsync("SELECT Id FROM Notes WHERE Id = @Id", param);
-                return note != null;
+                var note = await connection.QueryFirstOrDefaultAsync<string>("SELECT Id FROM Notes WHERE Id = @Id", param);
+                return note !=null;
             }
         }
 
@@ -114,7 +114,7 @@ namespace SimpleNotes.Api.Data {
             using (var connection = new SQLiteConnection(ConnectionString)) {
                 await connection.OpenAsync();
                 var param = new { Id = id };
-                var label = await connection.QueryFirstAsync("SELECT Id FROM Labels WHERE Id = @Id", param);
+                var label = await connection.QueryFirstOrDefaultAsync<string>("SELECT Id FROM Labels WHERE Id = @Id", param);
                 return label != null;
             }
         }
@@ -128,7 +128,7 @@ namespace SimpleNotes.Api.Data {
                 await connection.OpenAsync();
                 string sql = @"UPDATE Notes SET
                                Title = @Title, Content = @Content, 
-                               Pinned = @Pinned, ModifiedDate = @ModifiedDate
+                               ModifiedDate = @ModifiedDate
                                WHERE Id = @Id";
 
                 await connection.ExecuteAsync(sql, note);
@@ -136,5 +136,97 @@ namespace SimpleNotes.Api.Data {
 
         }
 
+        public async Task UpdateNotePinnedAsync(Note note) {
+            if (!await NoteExistsAsync(note.Id)) {
+                return;
+            }
+
+            using (var connection = new SQLiteConnection(ConnectionString)) {
+                await connection.OpenAsync();
+                string sql = @"UPDATE Notes SET
+                               Pinned = @Pinned
+                               WHERE Id = @Id";
+
+                await connection.ExecuteAsync(sql, note);
+            }
+        }
+
+        public async Task UpdateLabelAsync(Label label) {
+            if (!await LabelExistsAsync(label.Id)) {
+                return;
+            }
+
+            using (var connection = new SQLiteConnection(ConnectionString)) {
+                await connection.OpenAsync();
+                string sql = @"UPDATE Labels SET Name = @Name WHERE Id = @Id";
+                await connection.ExecuteAsync(sql, label);
+            }
+        }
+
+        public async Task DeleteUserDataAsync(string userId) {
+            using (var connection = new SQLiteConnection(ConnectionString)) {
+                await connection.OpenAsync();
+                var transaction = await connection.BeginTransactionAsync();
+                var param = new { Id = userId };
+
+                // Delete all notes that belong to the given user
+                string sql = "SELECT NoteId FROM UserNotes WHERE UserId = @Id";
+                IEnumerable<string> noteIds = await connection.QueryAsync<string>(sql, param);
+                foreach(string id in noteIds) {
+                    await DeleteNoteAsync(id, connection);
+                }
+
+                // Delete all labels that belong to the given user
+                sql = "SELECT LabelId FROM UserLabels WHERE UserId = @Id";
+                IEnumerable<string> labelIds = await connection.QueryAsync<string>(sql, param);
+                foreach(string id in labelIds) {
+                    await DeleteLabelAsync(id, connection);
+                }
+
+                await transaction.CommitAsync();
+            }
+        }
+
+        public async Task<int> DeleteNoteAsync(string id) {
+            if (!await NoteExistsAsync(id)) {
+                return 0 ;
+            }
+
+            using (var connection = new SQLiteConnection(ConnectionString)) {
+                await connection.OpenAsync();
+                var transaction = await connection.BeginTransactionAsync();
+                int deleteCount = await DeleteNoteAsync(id, connection);
+                await transaction.CommitAsync();
+                return deleteCount;
+            }
+        }
+
+        public async Task<int> DeleteLabelAsync(string id) {
+            if (!await LabelExistsAsync(id)) {
+                return 0;
+            }
+
+            using (var connection = new SQLiteConnection(ConnectionString)) {
+                await connection.OpenAsync();
+                var transaction = await connection.BeginTransactionAsync();
+                int deleteCount = await DeleteLabelAsync(id, connection);
+                await transaction.CommitAsync();
+                return deleteCount;
+            }
+        }
+
+        private async Task<int> DeleteNoteAsync(string id, SQLiteConnection connection) {
+            var param = new { Id = id };
+            await connection.ExecuteAsync("DELETE FROM UserNotes WHERE NoteId = @Id", param);
+            await connection.ExecuteAsync("DELETE FROM NoteLabels WHERE NoteId = @Id", param);
+            return await connection.ExecuteAsync("DELETE FROM Notes WHERE Id = @Id", param);
+        }
+
+        private async Task<int> DeleteLabelAsync(string id, SQLiteConnection connection) {
+            var param = new { Id = id };
+            await connection.ExecuteAsync("DELETE FROM UserLabels WHERE LabelId = @Id", param);
+            await connection.ExecuteAsync("DELETE FROM NoteLabels WHERE LabelId = @Id", param);
+            return await connection.ExecuteAsync("DELETE FROM Labels WHERE Id = @Id", param);
+        }
     }
 }

@@ -14,4 +14,5 @@ namespace SimpleNotes.Api.Models {
         public IEnumerable<string> LabelIds { get; set; }
 
     }
+
 }

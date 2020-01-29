@@ -113,6 +113,108 @@ namespace SimpleNotes.Api.Tests {
             Assert.Single(labelIds);
             Assert.Equal(labelId, labelIds.First());
         }
+
+        [Fact]
+        public async Task UpdateNote() {
+            string userId = Guid.NewGuid().ToString();
+            Note note = new Note {
+                Title = "Test Title",
+                Content = "Test Note",
+                Pinned = true,
+                ModifiedDate = "1/1/2020"
+            };
+
+            DataRepository repo = new DataRepository(ConnectionString);
+            string noteId = await repo.CreateNoteAsync(userId, note);
+
+            note.Title = "Changed Title";
+            note.Content = "Changed Content";
+            note.ModifiedDate = "1 minute ago";
+            await repo.UpdateNoteAsync(note);
+
+            IEnumerable<Note> notes = await repo.GetUserNotesAsync(userId);
+            Assert.Single(notes);
+            Note updatedNote = notes.First();
+            Assert.Equal(noteId, updatedNote.Id);
+            Assert.Equal(note.Title, updatedNote.Title);
+            Assert.Equal(note.Content, updatedNote.Content);
+            Assert.Equal(note.ModifiedDate, updatedNote.ModifiedDate);
+        }
+
+        [Fact]
+        public async Task UpdateLabel() {
+            string userId = Guid.NewGuid().ToString();
+            Label label = new Label { Name = "Test Label" };
+
+            DataRepository repo = new DataRepository(ConnectionString);
+            string id = await repo.CreateLabelAsync(userId, label);
+
+            label.Name = "Changed label";
+            await repo.UpdateLabelAsync(label);
+
+            IEnumerable<Label> labels = await repo.GetUserLabelsAsync(userId);
+            Assert.Single(labels);
+            Label updatedLabel = labels.First();
+            Assert.Equal(label.Name, updatedLabel.Name);
+        }
+
+        [Fact]
+        public async Task DeleteNote() {
+            string userId = "1234";
+            Note note = new Note {
+                Title = "Test Title",
+                Content = "Test Note",
+                Pinned = true,
+                ModifiedDate = "1/1/2020"
+            };
+
+            DataRepository repo = new DataRepository(ConnectionString);
+            string noteId = await repo.CreateNoteAsync(userId, note);
+
+            int count = await repo.DeleteNoteAsync(noteId);
+            Assert.Equal(1, count);
+            Assert.False(await repo.NoteExistsAsync(noteId));
+        }
+
+        [Fact]
+        public async Task DeleteLabel() {
+            string userId = "1234";
+            Label label = new Label { Name = "Test Label" };
+            DataRepository repo = new DataRepository(ConnectionString);
+            string id = await repo.CreateLabelAsync(userId, label);
+
+            int count = await repo.DeleteLabelAsync(id);
+
+            Assert.Equal(1, count);
+            Assert.False(await repo.LabelExistsAsync(id));
+        }
+
+        [Fact]
+        public async Task DeleteUserData() {
+            string userId = Guid.NewGuid().ToString();
+            Label label = new Label { Name = "Test Label" };
+            Note note = new Note {
+                Title = "Test Title",
+                Content = "Test Note",
+                Pinned = true,
+                ModifiedDate = "1/1/2020"
+            };
+
+            DataRepository repo = new DataRepository(ConnectionString);
+            string noteId = await repo.CreateNoteAsync(userId, note);
+            string labelId = await repo.CreateLabelAsync(userId, label);
+            await repo.AddLabelToNoteAsync(noteId, labelId);
+
+            await repo.DeleteUserDataAsync(userId);
+            
+            IEnumerable<Note> notes = await repo.GetUserNotesAsync(userId);
+            Assert.Empty(notes);
+            IEnumerable<Label> labels = await repo.GetUserLabelsAsync(userId);
+            Assert.Empty(labels);
+
+            Assert.False(await repo.NoteExistsAsync(noteId));
+            Assert.False(await repo.LabelExistsAsync(labelId));
+        }
     }
 
 }

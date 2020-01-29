@@ -51,7 +51,7 @@ namespace SimpleNotes.Api.Controllers {
             return Ok();
         }
 
-        [HttpPut]
+        [HttpPost]
         [AllowAnonymous]
         [Route("Register")]
         public async Task<IActionResult> Register(RegisterModel model) {

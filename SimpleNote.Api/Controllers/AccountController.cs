@@ -48,6 +48,7 @@ namespace SimpleNotes.Api.Controllers {
         [Route("Logout")]
         public async Task<ActionResult> Logout() {
             await SignInManager.SignOutAsync();
+            HttpContext.Session.Clear();
             return Ok();
         }
 

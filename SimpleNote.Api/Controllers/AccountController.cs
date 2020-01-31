@@ -83,7 +83,7 @@ namespace SimpleNotes.Api.Controllers {
             return Ok();
         }
 
-        [HttpPost]
+        [HttpPut]
         [Route("ChangePassword")]
         public async Task<IActionResult> ChangePassword(ChangePasswordModel model) {
             var applicationUser = await  UserManager.GetUserAsync(User);

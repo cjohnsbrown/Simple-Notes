@@ -12,6 +12,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using SimpleNotes.Api.Data;
+using SimpleNotes.Api.Services;
 
 namespace SimpleNotes.Api {
     public class Startup {
@@ -48,6 +49,7 @@ namespace SimpleNotes.Api {
             services.AddControllers();
 
             services.AddScoped<IDataRepository, DataRepository>();
+            services.AddScoped<INotesManager, NotesManager>();
 
         }
 

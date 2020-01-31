@@ -9,9 +9,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleNotes.Cryptography", 
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{F2D2B8DA-C3C2-4C71-A8BB-8ACD41540577}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleNotes.Cryptography.Tests", "SimpleNotes.Crypto.Tests\SimpleNotes.Cryptography.Tests.csproj", "{AF817C30-45AD-4189-8BF7-8138BD8B490A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleNotes.Api.Tests", "Tests\SimpleNotes.Api.Tests\SimpleNotes.Api.Tests.csproj", "{33285643-8627-480A-B3BF-08CB5065B3DF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleNotes.Api.Tests", "Tests\SimpleNotes.Api.Tests\SimpleNotes.Api.Tests.csproj", "{33285643-8627-480A-B3BF-08CB5065B3DF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleNotes.Cryptography.Tests", "Tests\SimpleNotes.Crypto.Tests\SimpleNotes.Cryptography.Tests.csproj", "{C36E94A8-7235-463B-9DED-A22D4DE5F7C9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,21 +27,21 @@ Global
 		{A0B457F7-AADD-4424-B7AC-D62837E410C7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A0B457F7-AADD-4424-B7AC-D62837E410C7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A0B457F7-AADD-4424-B7AC-D62837E410C7}.Release|Any CPU.Build.0 = Release|Any CPU
-		{AF817C30-45AD-4189-8BF7-8138BD8B490A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{AF817C30-45AD-4189-8BF7-8138BD8B490A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{AF817C30-45AD-4189-8BF7-8138BD8B490A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{AF817C30-45AD-4189-8BF7-8138BD8B490A}.Release|Any CPU.Build.0 = Release|Any CPU
 		{33285643-8627-480A-B3BF-08CB5065B3DF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{33285643-8627-480A-B3BF-08CB5065B3DF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{33285643-8627-480A-B3BF-08CB5065B3DF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{33285643-8627-480A-B3BF-08CB5065B3DF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C36E94A8-7235-463B-9DED-A22D4DE5F7C9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C36E94A8-7235-463B-9DED-A22D4DE5F7C9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C36E94A8-7235-463B-9DED-A22D4DE5F7C9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C36E94A8-7235-463B-9DED-A22D4DE5F7C9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{AF817C30-45AD-4189-8BF7-8138BD8B490A} = {F2D2B8DA-C3C2-4C71-A8BB-8ACD41540577}
 		{33285643-8627-480A-B3BF-08CB5065B3DF} = {F2D2B8DA-C3C2-4C71-A8BB-8ACD41540577}
+		{C36E94A8-7235-463B-9DED-A22D4DE5F7C9} = {F2D2B8DA-C3C2-4C71-A8BB-8ACD41540577}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {C4444880-3272-4050-830E-BADBF3FAA2A8}

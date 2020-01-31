@@ -15,10 +15,12 @@ namespace SimpleNotes.Api.Data {
         Task<bool> NoteExistsAsync(string id);
         Task<bool> LabelExistsAsync(string id);
         Task UpdateNoteAsync(Note note);
-        Task UpdateNotePinnedAsync(Note note);
+        Task UpdateNotePinnedAsync(string noteId, bool pinned);
         Task UpdateLabelAsync(Label label);
         Task DeleteUserDataAsync(string userId);
         Task<int> DeleteNoteAsync(string id);
         Task<int> DeleteLabelAsync(string id);
+        Task<bool> NoteBelongsToUserAsync(string userId, string noteId);
+        Task<bool> LabelBelongsToUser(string userId, string labelId);
     }
 }

@@ -136,18 +136,15 @@ namespace SimpleNotes.Api.Data {
 
         }
 
-        public async Task UpdateNotePinnedAsync(Note note) {
-            if (!await NoteExistsAsync(note.Id)) {
-                return;
-            }
-
+        public async Task UpdateNotePinnedAsync(string noteId, bool pinned) {
             using (var connection = new SQLiteConnection(ConnectionString)) {
                 await connection.OpenAsync();
+                var param = new { Id = noteId, Pinned = pinned };
                 string sql = @"UPDATE Notes SET
                                Pinned = @Pinned
                                WHERE Id = @Id";
 
-                await connection.ExecuteAsync(sql, note);
+                await connection.ExecuteAsync(sql, param);
             }
         }
 
@@ -214,6 +211,26 @@ namespace SimpleNotes.Api.Data {
                 return deleteCount;
             }
         }
+        public async Task<bool> NoteBelongsToUserAsync(string userId, string noteId) {
+            using (var connection = new SQLiteConnection(ConnectionString)) {
+                await connection.OpenAsync();
+                var param = new { UserId = userId, NoteId = noteId };
+                string sql = "SELECT COUNT(*) FROM UserNotes WHERE UserID = @UserId AND NoteId = @NoteId";
+                int count = await connection.ExecuteScalarAsync<int>(sql,param);
+                return count > 0;
+
+            }
+        }
+
+        public async Task<bool> LabelBelongsToUser(string userId, string labelId) {
+            using (var connection = new SQLiteConnection(ConnectionString)) {
+                await connection.OpenAsync();
+                var param = new { UserId = userId, LabelId= labelId};
+                string sql = "SELECT COUNT(*) FROM UserLabels WHERE UserID = @UserId AND LabelId= @LabelId";
+                int count = await connection.ExecuteScalarAsync<int>(sql, param);
+                return count > 0;
+            }
+        }
 
         private async Task<int> DeleteNoteAsync(string id, SQLiteConnection connection) {
             var param = new { Id = id };
@@ -228,5 +245,7 @@ namespace SimpleNotes.Api.Data {
             await connection.ExecuteAsync("DELETE FROM NoteLabels WHERE LabelId = @Id", param);
             return await connection.ExecuteAsync("DELETE FROM Labels WHERE Id = @Id", param);
         }
+
+      
     }
 }

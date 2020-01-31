@@ -206,7 +206,7 @@ namespace SimpleNotes.Api.Tests {
             await repo.AddLabelToNoteAsync(noteId, labelId);
 
             await repo.DeleteUserDataAsync(userId);
-            
+
             IEnumerable<Note> notes = await repo.GetUserNotesAsync(userId);
             Assert.Empty(notes);
             IEnumerable<Label> labels = await repo.GetUserLabelsAsync(userId);
@@ -214,6 +214,60 @@ namespace SimpleNotes.Api.Tests {
 
             Assert.False(await repo.NoteExistsAsync(noteId));
             Assert.False(await repo.LabelExistsAsync(labelId));
+        }
+
+        [Fact]
+        public async Task NoteBelongsToUser() {
+            string userId = Guid.NewGuid().ToString();
+            Note note = new Note {
+                Title = "Test Title",
+                Content = "Test Note",
+                Pinned = true,
+                ModifiedDate = "1/1/2020"
+            };
+
+            DataRepository repo = new DataRepository(ConnectionString);
+            string noteId = await repo.CreateNoteAsync(userId, note);
+
+            Assert.True(await repo.NoteBelongsToUserAsync(userId, noteId));
+        }
+
+        [Fact]
+        public async Task NoteDoesNotBelongToUser() {
+            string userId = Guid.NewGuid().ToString();
+            Note note = new Note {
+                Title = "Test Title",
+                Content = "Test Note",
+                Pinned = true,
+                ModifiedDate = "1/1/2020"
+            };
+
+            DataRepository repo = new DataRepository(ConnectionString);
+            string noteId = await repo.CreateNoteAsync(userId, note);
+
+            Assert.False(await repo.NoteBelongsToUserAsync("Wrong User", noteId));
+        }
+
+        [Fact]
+        public async Task LabelBelongsToUser() {
+            string userId = Guid.NewGuid().ToString();
+            Label label = new Label { Name = "Test Label" };
+
+            DataRepository repo = new DataRepository(ConnectionString);
+            string labelId = await repo.CreateLabelAsync(userId, label);
+
+            Assert.True(await repo.LabelBelongsToUser(userId, labelId));
+        }
+
+        [Fact]
+        public async Task LabelDoeNoteBelongsToUser() {
+            string userId = Guid.NewGuid().ToString();
+            Label label = new Label { Name = "Test Label" };
+
+            DataRepository repo = new DataRepository(ConnectionString);
+            string labelId = await repo.CreateLabelAsync(userId, label);
+
+            Assert.False(await repo.LabelBelongsToUser("Wrong User", labelId));
         }
     }
 

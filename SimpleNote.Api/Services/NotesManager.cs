@@ -16,7 +16,13 @@ namespace SimpleNotes.Api.Services {
     /// </summary>
     public interface INotesManager {
         Task<string> CreateNoteAsync(ClaimsPrincipal principal, string userKey, Note note);
-        Task<UserDataModel> GetUserDataAsync(ClaimsPrincipal principal, string userKey);
+        Task<UserDataResponse> GetUserDataAsync(ClaimsPrincipal principal, string userKey);
+        Task<string> CreateLabelAsync(ClaimsPrincipal principal, string userKey, Label label);
+        Task AddLabelToNoteAsync(string noteId, string labelId);
+        Task UpdateNoteAsync(ClaimsPrincipal principal, string userKey, Note note);
+        Task UpdateNotePinnedAsync(string noteId, bool pinned);
+        Task DeleteNoteAsync(string noteId);
+        Task<bool> NoteBelongsToUserAsync(ClaimsPrincipal principal, string noteId);
     }
 
     public class NotesManager : INotesManager {
@@ -29,9 +35,9 @@ namespace SimpleNotes.Api.Services {
             UserManager = userManager;
         }
 
-        public async Task<UserDataModel> GetUserDataAsync(ClaimsPrincipal principal, string userKey) {
+        public async Task<UserDataResponse> GetUserDataAsync(ClaimsPrincipal principal, string userKey) {
             ApplicationUser user = await UserManager.GetUserAsync(principal);
-            UserDataModel model = new UserDataModel();
+            UserDataResponse model = new UserDataResponse();
             model.Notes = await Repository.GetUserNotesAsync(user.Id);
             model.Labels = await Repository.GetUserLabelsAsync(user.Id);
             string secretKey = Crypto.Decrypt(userKey, user.SecretKey);
@@ -57,7 +63,40 @@ namespace SimpleNotes.Api.Services {
             return await Repository.CreateNoteAsync(user.Id, note);
         }
 
+        public async Task<string> CreateLabelAsync(ClaimsPrincipal principal, string userKey, Label label) {
+            ApplicationUser user = await UserManager.GetUserAsync(principal);
+            string secretKey = Crypto.Decrypt(userKey, user.SecretKey);
 
+            label.Name = Crypto.Encrypt(secretKey, label.Name);
+            return await Repository.CreateLabelAsync(user.Id, label);
+        }
+
+        public async Task AddLabelToNoteAsync(string noteId, string labelId) {
+            await Repository.AddLabelToNoteAsync(noteId, labelId);
+        }
+
+        public async Task UpdateNoteAsync(ClaimsPrincipal principal, string userKey, Note note) {
+            ApplicationUser user = await UserManager.GetUserAsync(principal);
+            string secretKey = Crypto.Decrypt(userKey, user.SecretKey);
+
+            note.Title = Crypto.Encrypt(secretKey, note.Title);
+            note.Content = Crypto.Encrypt(secretKey, note.Content);
+            await Repository.UpdateNoteAsync(note);
+
+        }
+
+        public async Task UpdateNotePinnedAsync(string noteId, bool pinned) {
+            await Repository.UpdateNotePinnedAsync(noteId, pinned); 
+        }
+
+        public async Task DeleteNoteAsync(string noteId) {
+            await Repository.DeleteNoteAsync(noteId);
+        }
+
+        public async Task<bool> NoteBelongsToUserAsync(ClaimsPrincipal principal, string noteId) {
+            ApplicationUser user = await UserManager.GetUserAsync(principal);
+            return await Repository.NoteBelongsToUserAsync(user.Id, noteId);
+        }
 
     }
 }

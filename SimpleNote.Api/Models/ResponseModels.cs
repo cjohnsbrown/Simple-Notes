@@ -11,4 +11,8 @@ namespace SimpleNotes.Api.Models {
         public IEnumerable<Label> Labels { get; set; }
     }
 
+    public class ItemCreatedResponse {
+        public string Id { get; set; }
+    }
+
 }

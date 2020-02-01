@@ -98,5 +98,31 @@ namespace SimpleNotes.Api.Services {
             return await Repository.NoteBelongsToUserAsync(user.Id, noteId);
         }
 
+        public async Task<bool> LabelNameExistsAsync(ClaimsPrincipal principal, string userKey, string labelName) {
+            ApplicationUser user = await UserManager.GetUserAsync(principal);
+            string secretKey = Crypto.Decrypt(userKey, user.SecretKey);
+
+            var labels =  await Repository.GetUserLabelsAsync(user.Id);
+            return labels.Select(label => Crypto.Decrypt(secretKey, label.Name))
+                         .Any(name => name.Equals(labelName, StringComparison.InvariantCultureIgnoreCase));
+                                   
+        }
+
+        public async Task<bool> LabelBelongdsToUserAsync(ClaimsPrincipal principal, string labelId) {
+            ApplicationUser user = await UserManager.GetUserAsync(principal);
+            return await Repository.LabelBelongsToUser(user.Id, labelId);
+        }
+
+        public async Task DeleteLabelAsync(string labelId) {
+            await Repository.DeleteLabelAsync(labelId);
+        }
+
+        public async Task UpdateLabelAsync(ClaimsPrincipal principal, string userKey, Label label) {
+            ApplicationUser user = await UserManager.GetUserAsync(principal);
+            string secretKey = Crypto.Decrypt(userKey, user.SecretKey);
+
+            label.Name = Crypto.Encrypt(secretKey, label.Name);
+            await Repository.UpdateLabelAsync(label);
+        }
     }
 }

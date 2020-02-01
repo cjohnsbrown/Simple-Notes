@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SimpleNotes.Api.Models;
 using SimpleNotes.Api.Services;
-using SimpleNotes.Cryptography;
 
 namespace SimpleNotes.Api.Controllers {
     [Route("api/[controller]")]
@@ -27,14 +26,13 @@ namespace SimpleNotes.Api.Controllers {
                 return BadRequest(ModelState);
             }
 
-            string userKey = HttpContext.Session.GetString(Crypto.UserKey);
-            if (await Manager.LabelNameExistsAsync(User, userKey, label.Name)) {
+            if (await Manager.LabelNameExistsAsync(HttpContext, label.Name)) {
                 ModelState.AddModelError(nameof(label.Name), $"A label named '{label.Name}' already exists");
                 return BadRequest(ModelState);
             }
 
             var item = new ItemCreatedResponse();
-            item.Id = await Manager.CreateLabelAsync(User, userKey, label);
+            item.Id = await Manager.CreateLabelAsync(HttpContext, label);
 
             return Created(string.Empty, item);
         }
@@ -51,13 +49,12 @@ namespace SimpleNotes.Api.Controllers {
                 return BadRequest(ModelState);
             }
 
-            string userKey = HttpContext.Session.GetString(Crypto.UserKey);
-            if (await Manager.LabelNameExistsAsync(User, userKey, label.Name)) {
+            if (await Manager.LabelNameExistsAsync(HttpContext, label.Name)) {
                 ModelState.AddModelError(nameof(label.Name), $"A label named '{label.Name}' already exists");
                 return BadRequest(ModelState);
             }
 
-            await Manager.UpdateLabelAsync(User, userKey, label);
+            await Manager.UpdateLabelAsync(HttpContext, label);
             return NoContent();
         }
 

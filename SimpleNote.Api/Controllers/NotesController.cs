@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SimpleNotes.Api.Models;
 using SimpleNotes.Api.Services;
-using SimpleNotes.Cryptography;
 
 namespace SimpleNotes.Api.Controllers {
     [Route("api/[controller]")]
@@ -26,8 +25,7 @@ namespace SimpleNotes.Api.Controllers {
         [HttpPost]
         public async Task<string> CreateNote([FromBody]Note note) {
 
-            string userKey = HttpContext.Session.GetString(Crypto.UserKey);
-            string id = await Manager.CreateNoteAsync(User, userKey, note);
+            string id = await Manager.CreateNoteAsync(HttpContext, note);
             Response.StatusCode = 201;
             return id;
         }
@@ -41,8 +39,7 @@ namespace SimpleNotes.Api.Controllers {
             }
 
             note.Id = id;
-            string userKey = HttpContext.Session.GetString(Crypto.UserKey);
-            await Manager.UpdateNoteAsync(User, userKey, note);
+            await Manager.UpdateNoteAsync(HttpContext, note);
             return Ok();
         }
 

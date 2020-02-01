@@ -24,9 +24,5 @@
     <Folder Include="wwwroot\lib\" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\SimpleNotes.Crypto\SimpleNotes.Cryptography.csproj" />
-  </ItemGroup>
-
 
 </Project>

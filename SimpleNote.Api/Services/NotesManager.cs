@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using SimpleNotes.Api.Data;
 using SimpleNotes.Api.Models;
 using System;
@@ -13,18 +14,18 @@ namespace SimpleNotes.Api.Services {
     /// handle the encryption/decryption
     /// </summary>
     public interface INotesManager {
-        Task<string> CreateNoteAsync(ClaimsPrincipal principal, string userKey, Note note);
-        Task<UserDataResponse> GetUserDataAsync(ClaimsPrincipal principal, string userKey);
-        Task<string> CreateLabelAsync(ClaimsPrincipal principal, string userKey, Label label);
+        Task<string> CreateNoteAsync(HttpContext context, Note note);
+        Task<UserDataResponse> GetUserDataAsync(HttpContext context);
+        Task<string> CreateLabelAsync(HttpContext context, Label label);
         Task AddLabelToNoteAsync(string noteId, string labelId);
-        Task UpdateNoteAsync(ClaimsPrincipal principal, string userKey, Note note);
+        Task UpdateNoteAsync(HttpContext context, Note note);
         Task UpdateNotePinnedAsync(string noteId, bool pinned);
         Task DeleteNoteAsync(string noteId);
         Task<bool> NoteBelongsToUserAsync(ClaimsPrincipal principal, string noteId);
-        Task<bool> LabelNameExistsAsync(ClaimsPrincipal principal, string userKey, string labelName);
+        Task<bool> LabelNameExistsAsync(HttpContext context, string labelName);
         Task<bool> LabelBelongsToUserAsync(ClaimsPrincipal principal, string labelId);
         Task DeleteLabelAsync(string labelId);
-        Task UpdateLabelAsync(ClaimsPrincipal principal, string userKey, Label label);
+        Task UpdateLabelAsync(HttpContext context, Label label);
     }
 
     public class NotesManager : INotesManager {
@@ -39,8 +40,9 @@ namespace SimpleNotes.Api.Services {
             Crypto = crypto;
         }
 
-        public async Task<UserDataResponse> GetUserDataAsync(ClaimsPrincipal principal, string userKey) {
-            ApplicationUser user = await UserManager.GetUserAsync(principal);
+        public async Task<UserDataResponse> GetUserDataAsync(HttpContext context) {
+            string userKey = context.Session.GetString(ICryptoService.UserKey);
+            ApplicationUser user = await UserManager.GetUserAsync(context.User);
             UserDataResponse model = new UserDataResponse();
             model.Notes = await Repository.GetUserNotesAsync(user.Id);
             model.Labels = await Repository.GetUserLabelsAsync(user.Id);
@@ -58,8 +60,9 @@ namespace SimpleNotes.Api.Services {
             return model;
         }
 
-        public async Task<string> CreateNoteAsync(ClaimsPrincipal principal, string userKey, Note note) {
-            ApplicationUser user = await UserManager.GetUserAsync(principal);
+        public async Task<string> CreateNoteAsync(HttpContext context, Note note) {
+            ApplicationUser user = await UserManager.GetUserAsync(context.User);
+            string userKey = context.Session.GetString(ICryptoService.UserKey);
             string secretKey = Crypto.Decrypt(userKey, user.SecretKey);
 
             note.Title = Crypto.Encrypt(secretKey, note.Title);
@@ -67,8 +70,9 @@ namespace SimpleNotes.Api.Services {
             return await Repository.CreateNoteAsync(user.Id, note);
         }
 
-        public async Task<string> CreateLabelAsync(ClaimsPrincipal principal, string userKey, Label label) {
-            ApplicationUser user = await UserManager.GetUserAsync(principal);
+        public async Task<string> CreateLabelAsync(HttpContext context, Label label) {
+            ApplicationUser user = await UserManager.GetUserAsync(context.User);
+            string userKey = context.Session.GetString(ICryptoService.UserKey);
             string secretKey = Crypto.Decrypt(userKey, user.SecretKey);
 
             label.Name = Crypto.Encrypt(secretKey, label.Name);
@@ -79,8 +83,9 @@ namespace SimpleNotes.Api.Services {
             await Repository.AddLabelToNoteAsync(noteId, labelId);
         }
 
-        public async Task UpdateNoteAsync(ClaimsPrincipal principal, string userKey, Note note) {
-            ApplicationUser user = await UserManager.GetUserAsync(principal);
+        public async Task UpdateNoteAsync(HttpContext context, Note note) {
+            ApplicationUser user = await UserManager.GetUserAsync(context.User);
+            string userKey = context.Session.GetString(ICryptoService.UserKey);
             string secretKey = Crypto.Decrypt(userKey, user.SecretKey);
 
             note.Title = Crypto.Encrypt(secretKey, note.Title);
@@ -102,8 +107,9 @@ namespace SimpleNotes.Api.Services {
             return await Repository.NoteBelongsToUserAsync(user.Id, noteId);
         }
 
-        public async Task<bool> LabelNameExistsAsync(ClaimsPrincipal principal, string userKey, string labelName) {
-            ApplicationUser user = await UserManager.GetUserAsync(principal);
+        public async Task<bool> LabelNameExistsAsync(HttpContext context, string labelName) {
+            ApplicationUser user = await UserManager.GetUserAsync(context.User);
+            string userKey = context.Session.GetString(ICryptoService.UserKey);
             string secretKey = Crypto.Decrypt(userKey, user.SecretKey);
 
             var labels =  await Repository.GetUserLabelsAsync(user.Id);
@@ -121,8 +127,9 @@ namespace SimpleNotes.Api.Services {
             await Repository.DeleteLabelAsync(labelId);
         }
 
-        public async Task UpdateLabelAsync(ClaimsPrincipal principal, string userKey, Label label) {
-            ApplicationUser user = await UserManager.GetUserAsync(principal);
+        public async Task UpdateLabelAsync(HttpContext context, Label label) {
+            ApplicationUser user = await UserManager.GetUserAsync(context.User);
+            string userKey = context.Session.GetString(ICryptoService.UserKey);
             string secretKey = Crypto.Decrypt(userKey, user.SecretKey);
 
             label.Name = Crypto.Encrypt(secretKey, label.Name);

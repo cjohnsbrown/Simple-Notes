@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SimpleNotes.Api.Models;
 using SimpleNotes.Api.Services;
-using SimpleNotes.Cryptography;
 
 namespace SimpleNotes.Api.Controllers {
     [Route("api/[controller]")]
@@ -23,8 +22,7 @@ namespace SimpleNotes.Api.Controllers {
 
         [HttpGet]
         public async Task<UserDataResponse> Get() {
-            string userKey = HttpContext.Session.GetString(Crypto.UserKey);
-            return await NotesManager.GetUserDataAsync(User, userKey);
+            return await NotesManager.GetUserDataAsync(HttpContext);
         }
 
     }

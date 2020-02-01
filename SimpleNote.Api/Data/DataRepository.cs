@@ -246,6 +246,13 @@ namespace SimpleNotes.Api.Data {
             return await connection.ExecuteAsync("DELETE FROM Labels WHERE Id = @Id", param);
         }
 
-      
+        public async Task<int> RemoveLabelFromNote(string noteId, string labelId) {
+            using (var connection = new SQLiteConnection(ConnectionString)) {
+                await connection.OpenAsync();
+                var param = new { NoteId = noteId, LabelId = labelId };
+                string sql = "DELETE FROM NoteLabels WHERE NoteId = @NoteId AND LabelId = @LabelId";
+                return await connection.ExecuteAsync(sql, param);
+            }
+        }
     }
 }

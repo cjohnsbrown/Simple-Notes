@@ -269,6 +269,26 @@ namespace SimpleNotes.Api.Tests {
 
             Assert.False(await repo.LabelBelongsToUser("Wrong User", labelId));
         }
+
+        [Fact]
+        public async Task RemoveLabelFromNote() {
+            string userId = Guid.NewGuid().ToString();
+            Label label = new Label { Name = "Test Label" };
+            Note note = new Note {
+                Title = "Test Title",
+                Content = "Test Note",
+                Pinned = true,
+                ModifiedDate = "1/1/2020"
+            };
+
+            DataRepository repo = new DataRepository(ConnectionString);
+            string noteId = await repo.CreateNoteAsync(userId, note);
+            string labelId = await repo.CreateLabelAsync(userId, label);
+
+            await repo.AddLabelToNoteAsync(noteId, labelId);
+            int deleteCount = await repo.RemoveLabelFromNote(noteId, labelId);
+            Assert.Equal(1, deleteCount);
+        }
     }
 
-}
+} 

@@ -26,6 +26,7 @@ namespace SimpleNotes.Api.Services {
         Task<bool> LabelBelongsToUserAsync(ClaimsPrincipal principal, string labelId);
         Task DeleteLabelAsync(string labelId);
         Task UpdateLabelAsync(HttpContext context, Label label);
+        Task RemoveLabelFromNote(string noteId, string labelId);
     }
 
     public class NotesManager : INotesManager {
@@ -134,6 +135,10 @@ namespace SimpleNotes.Api.Services {
 
             label.Name = Crypto.Encrypt(secretKey, label.Name);
             await Repository.UpdateLabelAsync(label);
+        }
+
+        public async Task RemoveLabelFromNote(string noteId, string labelId) {
+            await Repository.RemoveLabelFromNote(noteId, labelId);
         }
     }
 }

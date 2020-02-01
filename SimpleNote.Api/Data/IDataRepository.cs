@@ -22,5 +22,6 @@ namespace SimpleNotes.Api.Data {
         Task<int> DeleteLabelAsync(string id);
         Task<bool> NoteBelongsToUserAsync(string userId, string noteId);
         Task<bool> LabelBelongsToUser(string userId, string labelId);
+        Task<int> RemoveLabelFromNote(string noteId, string labelId);
     }
 }

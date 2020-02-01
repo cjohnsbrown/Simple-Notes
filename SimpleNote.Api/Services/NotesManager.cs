@@ -2,8 +2,6 @@
 using SimpleNotes.Api.Data;
 using SimpleNotes.Api.Models;
 using System;
-using System.Collections.Generic;
-using SimpleNotes.Cryptography;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -23,16 +21,22 @@ namespace SimpleNotes.Api.Services {
         Task UpdateNotePinnedAsync(string noteId, bool pinned);
         Task DeleteNoteAsync(string noteId);
         Task<bool> NoteBelongsToUserAsync(ClaimsPrincipal principal, string noteId);
+        Task<bool> LabelNameExistsAsync(ClaimsPrincipal principal, string userKey, string labelName);
+        Task<bool> LabelBelongsToUserAsync(ClaimsPrincipal principal, string labelId);
+        Task DeleteLabelAsync(string labelId);
+        Task UpdateLabelAsync(ClaimsPrincipal principal, string userKey, Label label);
     }
 
     public class NotesManager : INotesManager {
 
         IDataRepository Repository { get; }
         UserManager<ApplicationUser> UserManager { get; }
+        ICryptoService Crypto { get; }
 
-        public NotesManager(IDataRepository repository, UserManager<ApplicationUser> userManager) {
+        public NotesManager(IDataRepository repository, UserManager<ApplicationUser> userManager, ICryptoService crypto) {
             Repository = repository;
             UserManager = userManager;
+            Crypto = crypto;
         }
 
         public async Task<UserDataResponse> GetUserDataAsync(ClaimsPrincipal principal, string userKey) {
@@ -108,7 +112,7 @@ namespace SimpleNotes.Api.Services {
                                    
         }
 
-        public async Task<bool> LabelBelongdsToUserAsync(ClaimsPrincipal principal, string labelId) {
+        public async Task<bool> LabelBelongsToUserAsync(ClaimsPrincipal principal, string labelId) {
             ApplicationUser user = await UserManager.GetUserAsync(principal);
             return await Repository.LabelBelongsToUser(user.Id, labelId);
         }

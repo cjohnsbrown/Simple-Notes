@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using SimpleNotes.Api.Data;
 using SimpleNotes.Api.Models;
-using SimpleNotes.Cryptography;
+using SimpleNotes.Api.Services;
 
 namespace SimpleNotes.Api.Controllers {
 
@@ -19,10 +19,15 @@ namespace SimpleNotes.Api.Controllers {
 
         private SignInManager<ApplicationUser> SignInManager { get; }
         private UserManager<ApplicationUser> UserManager { get; }
+        private ICryptoService Crypto { get; }
 
-        public AccountController(SignInManager<ApplicationUser> signInManager, UserManager<ApplicationUser> userManager) {
+        public AccountController(SignInManager<ApplicationUser> signInManager, 
+                                  UserManager<ApplicationUser> userManager,
+                                  ICryptoService crypto) {
+
             SignInManager = signInManager;
             UserManager = userManager;
+            Crypto = crypto;
         }
 
         [HttpPost]
@@ -35,7 +40,7 @@ namespace SimpleNotes.Api.Controllers {
             if (result.Succeeded) {
                 var applicationUser = await UserManager.FindByNameAsync(model.Username);
                 string derivedKey = Crypto.DeriveKey(model.Password);
-                HttpContext.Session.SetString(Crypto.UserKey, derivedKey);
+                HttpContext.Session.SetString(ICryptoService.UserKey, derivedKey);
                 return Ok();
             }
 
@@ -79,7 +84,7 @@ namespace SimpleNotes.Api.Controllers {
             applicationUser.SecretKey = Crypto.Encrypt(derivedKey, secretKey);
             await UserManager.UpdateAsync(applicationUser);
 
-            HttpContext.Session.SetString(Crypto.UserKey, derivedKey);
+            HttpContext.Session.SetString(ICryptoService.UserKey, derivedKey);
             return Ok();
         }
 
@@ -96,7 +101,7 @@ namespace SimpleNotes.Api.Controllers {
             }
 
             // Get current derived key and decrypt the secret key
-            string derivedKey = HttpContext.Session.GetString(Crypto.UserKey);
+            string derivedKey = HttpContext.Session.GetString(ICryptoService.UserKey);
             string secretKey = Crypto.Decrypt(derivedKey, applicationUser.SecretKey);
 
             // Create new derived key to encrypt the secret key with
@@ -106,7 +111,7 @@ namespace SimpleNotes.Api.Controllers {
 
             // Update stored keys
             await UserManager.UpdateAsync(applicationUser);
-            HttpContext.Session.SetString(Crypto.UserKey, derivedKey);
+            HttpContext.Session.SetString(ICryptoService.UserKey, derivedKey);
             return Ok();
         }
 

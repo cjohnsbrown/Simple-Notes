@@ -50,6 +50,7 @@ namespace SimpleNotes.Api {
 
             services.AddScoped<IDataRepository, DataRepository>();
             services.AddScoped<INotesManager, NotesManager>();
+            services.AddScoped<ICryptoService, CryptoService>();
 
         }
 
@@ -68,6 +69,8 @@ namespace SimpleNotes.Api {
             app.UseEndpoints(endpoints => {
                 endpoints.MapControllers();
             });
+
+            app.UseStaticFiles();
         }
     }
 }

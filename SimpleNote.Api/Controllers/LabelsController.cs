@@ -46,7 +46,7 @@ namespace SimpleNotes.Api.Controllers {
                 return BadRequest(ModelState);
             }
 
-            if (! await Manager.LabelBelongdsToUserAsync(User, label.Id)) {
+            if (! await Manager.LabelBelongsToUserAsync(User, label.Id)) {
                 ModelState.AddModelError(nameof(label.Id), "User does not have a label that matches the given id");
                 return BadRequest(ModelState);
             }
@@ -64,7 +64,7 @@ namespace SimpleNotes.Api.Controllers {
         // DELETE: api/Labels/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(string id) {
-            if (!await Manager.LabelBelongdsToUserAsync(User, id)) {
+            if (!await Manager.LabelBelongsToUserAsync(User, id)) {
                 ModelState.AddModelError("Id", "User does not have a label that matches the given id");
                 return BadRequest(ModelState);
             }

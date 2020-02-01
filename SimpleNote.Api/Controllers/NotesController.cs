@@ -40,7 +40,7 @@ namespace SimpleNotes.Api.Controllers {
 
             note.Id = id;
             await Manager.UpdateNoteAsync(HttpContext, note);
-            return Ok();
+            return NoContent();
         }
 
         // DELETE: api/ApiWithActions/5
@@ -52,7 +52,7 @@ namespace SimpleNotes.Api.Controllers {
             }
 
             await Manager.DeleteNoteAsync(id);
-            return Ok();
+            return NoContent();
         }
 
         [HttpPatch]
@@ -64,16 +64,41 @@ namespace SimpleNotes.Api.Controllers {
             }
 
             await Manager.UpdateNotePinnedAsync(id, pinned);
-            return Ok();
+            return NoContent();
         }
 
         [HttpPost]
         [Route("{id}/Label")]
-        public void AddLabel(string id, [FromBody]string labelId) {
+        public async Task<IActionResult> AddLabel(string id, [FromBody]NoteLabelRequest noteLabel) {
+            if (!await Manager.NoteBelongsToUserAsync(User, id)) {
+                ModelState.AddModelError("Id", "User does not have a note that matches this id");
+                return BadRequest(ModelState);
+            }
+
+            if (!await Manager.LabelBelongsToUserAsync(User, noteLabel.LabelId)) {
+                ModelState.AddModelError(nameof(noteLabel.LabelId), "User does not have a label that matches this id");
+                return BadRequest(ModelState);
+            }
+
+            await Manager.AddLabelToNoteAsync(id, noteLabel.LabelId);
+            return NoContent();
         }
 
         [HttpDelete]
         [Route("{id}/Label")]
-        public void RemoveLabel(string id, [FromBody]string labelId) { }
+        public async Task<IActionResult> RemoveLabel(string id, [FromBody]NoteLabelRequest noteLabel) {
+            if (!await Manager.NoteBelongsToUserAsync(User, id)) {
+                ModelState.AddModelError("Id", "User does not have a note that matches this id");
+                return BadRequest(ModelState);
+            }
+
+            if (!await Manager.LabelBelongsToUserAsync(User, noteLabel.LabelId)) {
+                ModelState.AddModelError(nameof(noteLabel.LabelId), "User does not have a label that matches this id");
+                return BadRequest(ModelState);
+            }
+
+            await Manager.RemoveLabelFromNote(id, noteLabel.LabelId);
+            return NoContent();
+        }
     }
 }

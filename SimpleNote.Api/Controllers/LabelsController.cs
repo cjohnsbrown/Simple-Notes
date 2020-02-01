@@ -22,6 +22,10 @@ namespace SimpleNotes.Api.Controllers {
         // POST: api/Labels
         [HttpPost]
         public async Task<IActionResult> CreateLabel([FromBody] Label label) {
+            if (label == null) {
+                return NotFound();
+            }
+
             if (!ModelState.IsValid) {
                 return BadRequest(ModelState);
             }
@@ -40,6 +44,10 @@ namespace SimpleNotes.Api.Controllers {
         // PUT: api/Labels/5
         [HttpPatch("{id}")]
         public async Task<IActionResult> UpdateLabel(string id, [FromBody]Label label) {
+            if (string.IsNullOrEmpty(id) || label == null) {
+                return NotFound();
+            }
+
             if (!ModelState.IsValid) {
                 return BadRequest(ModelState);
             }
@@ -61,6 +69,10 @@ namespace SimpleNotes.Api.Controllers {
         // DELETE: api/Labels/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(string id) {
+            if (string.IsNullOrEmpty(id)) {
+                return NotFound();
+            }
+
             if (!await Manager.LabelBelongsToUserAsync(User, id)) {
                 ModelState.AddModelError("Id", "User does not have a label that matches the given id");
                 return BadRequest(ModelState);

@@ -23,16 +23,23 @@ namespace SimpleNotes.Api.Controllers {
 
         // POST: api/Notes
         [HttpPost]
-        public async Task<string> CreateNote([FromBody]Note note) {
+        public async Task<IActionResult> CreateNote([FromBody]Note note) {
+            if (note == null) {
+                return NotFound();
+            }
 
-            string id = await Manager.CreateNoteAsync(HttpContext, note);
-            Response.StatusCode = 201;
-            return id;
+            var item = new ItemCreatedResponse();
+            item.Id = await Manager.CreateNoteAsync(HttpContext, note);
+            return Created(string.Empty, item);
         }
 
         // PUT: api/Notes/5
         [HttpPatch("{id}")]
         public async Task<IActionResult> Patch(string id, [FromBody] Note note) {
+            if (string.IsNullOrWhiteSpace(id) || note == null) {
+                return NotFound();
+            }
+
             if (! await Manager.NoteBelongsToUserAsync(User, id)) {
                 ModelState.AddModelError(nameof(note.Id), "User does not have a note that matches this id");
                 return BadRequest(ModelState);
@@ -46,6 +53,10 @@ namespace SimpleNotes.Api.Controllers {
         // DELETE: api/ApiWithActions/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(string id) {
+            if (string.IsNullOrWhiteSpace(id)) {
+                return NotFound();
+            }
+
             if (!await Manager.NoteBelongsToUserAsync(User, id)) {
                 ModelState.AddModelError("Id", "User does not have a note that matches this id");
                 return BadRequest(ModelState);
@@ -57,19 +68,26 @@ namespace SimpleNotes.Api.Controllers {
 
         [HttpPatch]
         [Route("{id}/pinned")]
-        public async Task<IActionResult> Pinned(string id, [FromBody]bool pinned) {
+        public async Task<IActionResult> Pinned(string id, [FromBody]SetPinnedRequest pinnedRequest) {
+            if (string.IsNullOrWhiteSpace(id) || pinnedRequest == null) {
+                return NotFound();
+            }
             if (!await Manager.NoteBelongsToUserAsync(User, id)) {
                 ModelState.AddModelError("Id", "User does not have a note that matches this id");
                 return BadRequest(ModelState);
             }
 
-            await Manager.UpdateNotePinnedAsync(id, pinned);
+            await Manager.UpdateNotePinnedAsync(id, pinnedRequest.Pinned);
             return NoContent();
         }
 
         [HttpPost]
         [Route("{id}/Label")]
         public async Task<IActionResult> AddLabel(string id, [FromBody]NoteLabelRequest noteLabel) {
+            if (string.IsNullOrWhiteSpace(id) || noteLabel == null) {
+                return NotFound();
+            }
+
             if (!await Manager.NoteBelongsToUserAsync(User, id)) {
                 ModelState.AddModelError("Id", "User does not have a note that matches this id");
                 return BadRequest(ModelState);
@@ -87,6 +105,10 @@ namespace SimpleNotes.Api.Controllers {
         [HttpDelete]
         [Route("{id}/Label")]
         public async Task<IActionResult> RemoveLabel(string id, [FromBody]NoteLabelRequest noteLabel) {
+            if (string.IsNullOrWhiteSpace(id) || noteLabel == null) {
+                return NotFound();
+            }
+
             if (!await Manager.NoteBelongsToUserAsync(User, id)) {
                 ModelState.AddModelError("Id", "User does not have a note that matches this id");
                 return BadRequest(ModelState);

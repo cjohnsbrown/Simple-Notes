@@ -38,7 +38,6 @@ namespace SimpleNotes.Api.Controllers {
                 await SignInManager.PasswordSignInAsync(model.Username, model.Password, model.RememberMe, lockoutOnFailure: false);
 
             if (result.Succeeded) {
-                var applicationUser = await UserManager.FindByNameAsync(model.Username);
                 string derivedKey = Crypto.DeriveKey(model.Password);
                 HttpContext.Session.SetString(ICryptoService.UserKey, derivedKey);
                 return Ok();
@@ -89,7 +88,7 @@ namespace SimpleNotes.Api.Controllers {
         }
 
         [HttpPut]
-        [Route("ChangePassword")]
+        [Route("Password")]
         public async Task<IActionResult> ChangePassword(ChangePasswordModel model) {
             var applicationUser = await  UserManager.GetUserAsync(User);
             var result = await UserManager.ChangePasswordAsync(applicationUser, model.CurrentPassword, model.NewPassword);
@@ -117,7 +116,7 @@ namespace SimpleNotes.Api.Controllers {
 
         [HttpGet]
         [AllowAnonymous]
-        [Route("IsAuthenticated")]
+        [Route("Authenticated")]
         public bool IsAuthenticated() {
             return User.Identity.IsAuthenticated;
         }

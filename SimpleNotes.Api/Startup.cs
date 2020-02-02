@@ -4,9 +4,9 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using SimpleNotes.Api.Data;
 using SimpleNotes.Api.Services;
+using SimpleNotes.Api.Middleware;
 
 namespace SimpleNotes.Api {
     public class Startup {

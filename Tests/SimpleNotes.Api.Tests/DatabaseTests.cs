@@ -1,8 +1,8 @@
+using Microsoft.Data.Sqlite;
 using SimpleNotes.Api.Data;
 using SimpleNotes.Api.Models;
 using System;
 using System.Collections.Generic;
-using System.Data.SQLite;
 using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
@@ -13,7 +13,7 @@ namespace SimpleNotes.Api.Tests {
         public readonly string ConnectionString = "data source=mode=memory";
 
         public DatabaseTests() {
-            using (var connection = new SQLiteConnection(ConnectionString)) {
+            using (var connection = new SqliteConnection(ConnectionString)) {
                 DbInitializer.AddTables(connection.CreateCommand());
             }
         }

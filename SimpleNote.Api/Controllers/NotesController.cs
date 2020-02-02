@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SimpleNotes.Api.Models;
 using SimpleNotes.Api.Services;
+using System.Threading.Tasks;
 
 namespace SimpleNotes.Api.Controllers {
     [Route("api/[controller]")]
